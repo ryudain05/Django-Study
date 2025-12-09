@@ -10,6 +10,11 @@ def posts_view(request):
         posts = Post.objects.all()
         context = {"posts": posts, "form": PostForm}
         return render(request, "post_list.html", context)
+
+def post_create_view(request):
+    if request.method == "GET":
+        context = {"form": PostForm}
+        return render(request, "post_create.html", context)
     elif request.method == "POST":
         form = PostForm(request.POST)
         if form.is_valid():
