@@ -2,13 +2,13 @@
 {% block content %}
 <h2>게시글 목록</h2>
 {% if posts %}
-    <ul>
+    <ol type ="1">
         {% for post in posts %}
             <li>
                 <a href="{% url 'post' post.id %}">{{ post.title }}</a>
             </li>
         {% endfor %}
-    </ul>
+    </ol>
 {% else %}
  <p>No Posts!</p>
 {% endif %}

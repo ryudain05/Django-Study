@@ -1,3 +1,17 @@
-li a {
-    color: #ff6600;
+body {
+    padding-left: 200px;
+    padding-right: 200px;
+}
+
+.content {
+    background-color: #f6f6f60;
+}
+
+ol li::marker {
+    color: #777777;
+}
+
+a {
+    color: inherit;
+    text-decoration: none;
 }
