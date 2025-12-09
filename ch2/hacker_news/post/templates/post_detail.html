@@ -1,0 +1,13 @@
+<h2>{{ post.title }}</h2>
+<ul>
+  <li>내용: {{ post.body }}</li>
+  <li>작성자: {{ post.author_name }}</li>
+  <li>점수: {{ post.points }}</li>
+  <li>작성일: {{ post.created_at }}</li>
+</ul>
+
+<form action="{% url 'post_like' post.id %}" method="post">
+    {% csrf_token %}
+    <input type="submit" value="👍 좋아요">
+</form>
+<a href="{% url 'posts' %}"> 💭 게시글 목록</a>
