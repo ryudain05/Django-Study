@@ -9,6 +9,7 @@
         {% csrf_token %}
         <button type="submit">로그아웃</button>
     </form>
+    <a href="{% url 'password_change' %}">비밀번호 변경</a>
 
     {% else %}
     <a href="{% url 'login' %}">로그인</a>
