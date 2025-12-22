@@ -80,6 +80,7 @@ DATABASES = {
     }
 }
 
+AUTH_USER_MODEL = "user.CustomUser"
 
 # Password validation
 # https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators
@@ -124,3 +125,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 LOGIN_REDIRECT_URL = 'home'
 LOGOUT_REDIRECT_URL = 'home'
+
+KAKAO_REST_API_KEY = 'af5112ed8cd38607bf15268cabb8c7d3'
+KAKAO_CALLBACK_URL = 'http://127.0.0.1:8000/users/social/kakao/callback/'
+
