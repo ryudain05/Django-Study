@@ -1,8 +1,15 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 
+class SocialProviderChoice(models.TextChoices):
+    KAKAO = "kakao", "Kakao" # 값: 라벨 Dict 형식, DB엔 값이 저장됨
+    NAVER = "naver", "Naver"
+    GOOGLE = "googel", "Google"
+
 class CustomUser(AbstractUser):
-    pass
+    social_provider = models.CharField(
+        choices=SocialProviderChoice.choices, max_length=8
+    )
 
 # 1:1
 class Profile(models.Model):
@@ -21,17 +28,17 @@ class Order(models.Model):
 # N:M
 class Project(models.Model):
     name = models.CharField(max_length=20)
-#     users = models.ManyToManyField(CustomUser, through="ProjectUser")
-#
-# class ProjectUser(models.Model):
-#     customuser = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
-#     project = models.ForeignKey(Project, on_delete=models.CASCADE)
-#     created_at = models.DateTimeField(auto_now_add=True)
-#
-#     class Meta:
-#         db_table = 'orm_project_user'
+    users = models.ManyToManyField(CustomUser, through="ProjectUser")
 
-class UserProjectRelation(models.Model):
-    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+class ProjectUser(models.Model):
+    customuser = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     project = models.ForeignKey(Project, on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        db_table = 'orm_project_user'
+
+# class UserProjectRelation(models.Model):
+#     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+#     project = models.ForeignKey(Project, on_delete=models.CASCADE)
+#     created_at = models.DateTimeField(auto_now_add=True)
