@@ -135,3 +135,5 @@ if os.getenv("PRINT_SQL"):
             },
         },
     }
+
+MEDIA_ROOT = BASE_DIR / 'media'
