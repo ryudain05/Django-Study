@@ -56,7 +56,9 @@ ROOT_URLCONF = 'config.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [
+            BASE_DIR / "templates",
+        ],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -76,8 +78,12 @@ WSGI_APPLICATION = 'config.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'hands_on',
+        "USER": "dev_user",
+        "PASSWORD": 'securepassword',
+        "HOST": 'localhost',
+        "PORT": '54321',
     }
 }
 
@@ -137,3 +143,10 @@ if os.getenv("PRINT_SQL"):
     }
 
 MEDIA_ROOT = BASE_DIR / 'media'
+
+EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+EMAIL_HOST = "smtp.gmail.com"
+EMAIL_USE_TLS = True
+EMAIL_PORT = 587
+EMAIL_HOST_USER = "dai97058@gmail.com" # 발신자 이메일
+EMAIL_HOST_PASSWORD = "" # App Password
