@@ -13,5 +13,11 @@ services:
     ports:
       - "54321:5432"
 
+  cache:
+    container_name: django_redis
+    image: redis:7.4
+    ports:
+      - "63790:6379"
+
 volumes:
   local_db:
