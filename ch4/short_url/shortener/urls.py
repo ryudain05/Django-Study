@@ -8,4 +8,5 @@ urlpatterns = [
 
     # drf
     path("api/short-urls/", api.ShortURLAPIView.as_view(), name="short_urls_api"),
+    path("api/short-urls/<str:code>/", api.ShortURLDetailAPIView.as_view(), name="short_url_detail_api"),
 ]

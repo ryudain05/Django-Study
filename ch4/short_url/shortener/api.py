@@ -1,4 +1,5 @@
-from rest_framework.generics import get_object_or_404
+from rest_framework import status
+from rest_framework.generics import get_object_or_404, GenericAPIView, ListAPIView, ListCreateAPIView, DestroyAPIView
 from rest_framework.views import APIView
 from rest_framework.response import Response
 
@@ -6,28 +7,24 @@ from shortener.models import ShortURL
 from shortener.serializers import ShortURLResponseSerializer, ShortURLCreateSerializer
 
 
-class ShortURLAPIView(APIView):
-    def get(self, request):
-        short_urls = ShortURL.objects.all()
-        serializer = ShortURLResponseSerializer(short_urls, many=True)
-        return Response(data=serializer.data) # JSON 데이터
+class ShortURLAPIView(ListCreateAPIView):
+    queryset = ShortURL.objects.all()
+    serializer_class = ShortURLResponseSerializer
 
-    def post(self, request):
-        serializer = ShortURLCreateSerializer(data=request.data) # drf는 request.data 사용(기존: request.POST)
+    def perform_create(self, serializer):
+        while True:
+            code = ShortURL.generate_code()
+            if not ShortURL.objects.filter(code=code).exists():
+                break
+        serializer.save(code=code)
+
+    def create(self, request, *args, **kwargs):
+        serializer = ShortURLCreateSerializer(data=request.data)
         if serializer.is_valid():
-            while True:
-                code = ShortURL.generate_code()
-                if not ShortURL.objects.filter(code=code).exists():
-                    break
+            self.perform_create(serializer)
+            return Response(data=ShortURLResponseSerializer(serializer.instance).data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-            short_url = serializer.save(code=code)
-            return Response(
-                data=ShortURLResponseSerializer(short_url).data,
-                status=201,
-            )
-
-class ShortURLDetailAPIView(APIView):
-    def delete(self, request, code):
-        short_url = get_object_or_404(ShortURL, code=code)
-        short_url.delete()
-        return Response(status=204)
+class ShortURLDetailAPIView(DestroyAPIView):
+    queryset = ShortURL.objects.all()
+    lookup_field = "code"
