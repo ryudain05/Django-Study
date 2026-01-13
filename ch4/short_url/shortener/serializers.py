@@ -7,7 +7,12 @@ from shortener.models import ShortURL
 class ExampleSerializer(serializers.Serializer):
     name = serializers.CharField(max_length=100)
 
-class ShortURLResponseSerializer(serializers. ModelSerailzer):
+class ShortURLResponseSerializer(serializers. ModelSerializer):
     class Meta:
         model = ShortURL
         fields = "__all__"
+
+class ShortURLCreateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ShortURL
+        fields = ["original_url"]  # 클라이언트가 제공해야 하는 필드

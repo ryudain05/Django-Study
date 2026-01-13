@@ -1,5 +1,5 @@
-from shortener import views
 from django.urls import path
+from shortener import views, api
 
 urlpatterns = [
     path("", views.HomeView.as_view(), name="home"),
@@ -7,7 +7,5 @@ urlpatterns = [
     path("<str:code>/", views.ShortURLDetailView.as_view(), name="short_url_detail"),
 
     # drf
-    # path("api/", views.HomeView.as_view(), name="home_api"),
-    # path("api/short-urls/", views.ShortURLCreateView.as_view(), name="shorten_url_api"),
-    # path("api/<str:code>/", views.ShortURLDetailView.as_view(), name="short_url_detail_api"),
+    path("api/short-urls/", api.ShortURLAPIView.as_view(), name="short_urls_api"),
 ]
