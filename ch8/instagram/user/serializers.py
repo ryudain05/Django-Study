@@ -18,3 +18,8 @@ class UserSignUpSerializer(serializers.ModelSerializer):
 
 # serializers.save() 호출 시 비밀번호를 해싱하여 저장
 # CustomUser.oejbcts.create_user() 메서드를 사용하여 비밀번호를 안전하게 저장 / 일반 create() 메서드는 비밀번호를 해싱하지 않음
+
+class UserMeResponseSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CustomUser
+        fields = "__all__"

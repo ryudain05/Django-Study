@@ -1,7 +1,9 @@
 from django.urls import path
-
+from rest_framework_simplejwt import views as jwt_views
 from user import views
 
 urlpatterns = [
     path("", views.UserSignUpView.as_view(), name="user_sign_up"),
+    path("login/", jwt_views.TokenObtainPairView.as_view(), name="user_login"),
+    path("me/", views.UserMeView.as_view(), name="user_me"),
 ]
