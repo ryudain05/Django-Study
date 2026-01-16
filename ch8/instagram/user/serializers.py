@@ -1,3 +1,4 @@
+from django.contrib.auth.hashers import make_password
 from rest_framework import serializers
 from user.models import CustomUser
 
@@ -23,3 +24,13 @@ class UserMeResponseSerializer(serializers.ModelSerializer):
     class Meta:
         model = CustomUser
         fields = "__all__"
+
+class UserMeUpdateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CustomUser
+        fields = ["username", "password"]
+
+    def update(self, instance, validated_data):
+        if password := validated_data.get("password"):
+            validated_data["password"] = make_password(password)
+        return super().update(instance, validated_data)
