@@ -1,9 +1,10 @@
+from django.core.exceptions import PermissionDenied
 from django.shortcuts import render
-from rest_framework.generics import CreateAPIView, RetrieveUpdateAPIView
+from rest_framework.generics import CreateAPIView, RetrieveUpdateAPIView, GenericAPIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.authentication import JWTAuthentication
 
-from user.models import CustomUser
+from user.models import CustomUser, Follow
 from user.serializers import UserSignUpSerializer, UserMeResponseSerializer, UserMeUpdateSerializer
 
 
@@ -28,3 +29,17 @@ class UserMeView(RetrieveUpdateAPIView):
         elif self.request.method in ["PUT", "PATCH"]:
             return UserMeUpdateSerializer
         return super().get_serializer_class()
+
+class UserFollowView(GenericAPIView):
+    permission_classes = [IsAuthenticated]
+    authentication_classes = [JWTAuthentication]
+
+    def post(self, request, user_id):
+        if user_id == request.user.id:
+            raise PermissionDenied("자기 자신을 팔로우 할 수 없습니다.")
+
+        # 조회 또는 생성
+        # 조회 -> 결과 반환
+        # 조회 X -> 생성 후 결과 반환
+        Follow.objects.get_or_create(user_id=user_id, follower_id=request.user.id)
+

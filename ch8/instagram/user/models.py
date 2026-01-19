@@ -12,3 +12,17 @@ class CustomUser(AbstractUser):
         constraints = [
             models.UniqueConstraint(fields=['email'], name='unique_email')
         ]
+
+class Follow(models.Model):
+    user = models.ForeignKey(CustomUser, related_name="followers", on_delete=models.CASCADE) # 나를 팔로우하고 있는 사용자들 집합
+    follower = models.ForeignKey(CustomUser, related_name="followings", on_delete=models.CASCADE) # 내가 팔로우하고 있는 사용자들 집합
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=['user', 'follower'], name='unique_follow_relationship')
+        ]
+        ordering = ['-created_at'] # 최신 팔로우가 먼저 오도록 정렬
+
+    def __str__(self):
+        return f"{self.follower_id} -> {self.user_id}"
