@@ -34,3 +34,12 @@ class UserMeUpdateSerializer(serializers.ModelSerializer):
         if password := validated_data.get("password"):
             validated_data["password"] = make_password(password)
         return super().update(instance, validated_data)
+
+class UserFollowResponseSerializer(serializers.ModelSerializer):
+    user_id = serializers.PrimaryKeyRelatedField(source="user", read_only=True)
+    follower_id = serializers.PrimaryKeyRelatedField(source="follower", read_only=True)
+
+    class Meta:
+        model = CustomUser
+        fields = ["id", "user_id", "follower_id", "created_at"]
+        # __all__ 사용 시 순환 참조 오류 발생

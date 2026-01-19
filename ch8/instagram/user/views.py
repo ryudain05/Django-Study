@@ -1,11 +1,14 @@
 from django.core.exceptions import PermissionDenied
 from django.shortcuts import render
+from rest_framework import status
+from rest_framework.response import Response
 from rest_framework.generics import CreateAPIView, RetrieveUpdateAPIView, GenericAPIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.authentication import JWTAuthentication
 
 from user.models import CustomUser, Follow
-from user.serializers import UserSignUpSerializer, UserMeResponseSerializer, UserMeUpdateSerializer
+from user.serializers import UserSignUpSerializer, UserMeResponseSerializer, UserMeUpdateSerializer, \
+    UserFollowResponseSerializer
 
 
 # Create your views here.
@@ -41,5 +44,12 @@ class UserFollowView(GenericAPIView):
         # 조회 또는 생성
         # 조회 -> 결과 반환
         # 조회 X -> 생성 후 결과 반환
-        Follow.objects.get_or_create(user_id=user_id, follower_id=request.user.id)
+        follow, created = Follow.objects.get_or_create(
+            user_id=user_id, follower_id=request.user.id
+        )
+        serializer = UserFollowResponseSerializer(follow)
 
+        if created:
+            return Response(data=serializer.data, status=status.HTTP_201_CREATED)
+
+        return Response(data=serializer.data, status=status.HTTP_200_OK)
