@@ -41,5 +41,5 @@ class UserFollowResponseSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = CustomUser
-        fields = ["id", "user_id", "follower_id", "created_at"]
+        fields = ["id", "user_id", "follower_id"]
         # __all__ 사용 시 순환 참조 오류 발생

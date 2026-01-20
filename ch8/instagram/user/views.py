@@ -53,3 +53,8 @@ class UserFollowView(GenericAPIView):
             return Response(data=serializer.data, status=status.HTTP_201_CREATED)
 
         return Response(data=serializer.data, status=status.HTTP_200_OK)
+
+    def delete(self, request, user_id):
+        # 조건에 맞는 팔로우 관계가 존재하는 경우, 데이터 삭제. 그렇지 않으면 아무 일도 발생하지 않음
+        Follow.objects.filter(user_id=user_id, follower_id=request.user.id).delete() # user_id는 대상 유저, follower_id는 요청을 보낸 사용자
+        return Response(status=status.HTTP_204_NO_CONTENT)
