@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from feed.models import Post
+from feed.models import Post, PostComment
 
 
 class PostSerializer(serializers.ModelSerializer):
@@ -9,3 +9,28 @@ class PostSerializer(serializers.ModelSerializer):
     class Meta:
         model = Post
         fields = ['id', 'user_id', 'image', 'description', 'created_at']
+
+# 댓글 -> 부모 None
+# 대댓글 -> 부모 1
+
+class PostCommentCreateSerializer(serializers.ModelSerializer):
+    post_id = serializers.PrimaryKeyRelatedField(source='post', queryset=Post.objects.all()) # 입력을 받을 때는 유효한 값인지 queryset으로 검사
+    user_id = serializers.PrimaryKeyRelatedField(source='user', read_only=True) # 읽기 전용
+    parent_id = serializers.PrimaryKeyRelatedField(source='parent', queryset=PostComment.objects.all(), required=False)
+
+    class Meta:
+        model = PostComment
+        fields = ['id', 'post_id', 'user_id', 'parent_id', 'content', 'created_at']
+
+    def validate(self, attrs):
+       post, parent = attrs.get('post'), attrs.get('parent')
+
+
+        # 대댓글 작성하려는 경우
+       if parent:
+           if parent.post != post:
+               raise serializers.ValidationError('댓글의 게시글과 대댓글의 게시글이 일차하지 않습니다.')
+           if parent.parent is not None:
+               raise serializers.ValidationError('대댓글에는 다시 대댓글을 작성할 수 없습니다.')
+
+       return attrs
