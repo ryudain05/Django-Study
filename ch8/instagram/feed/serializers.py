@@ -1,6 +1,7 @@
 from rest_framework import serializers
 
 from feed.models import Post, PostComment
+from user.models import CustomUser
 
 
 class PostSerializer(serializers.ModelSerializer):
@@ -34,3 +35,30 @@ class PostCommentCreateSerializer(serializers.ModelSerializer):
                raise serializers.ValidationError('대댓글에는 다시 대댓글을 작성할 수 없습니다.')
 
        return attrs
+
+class UserBriefSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CustomUser
+        fields = ['id', 'username']
+
+class PostCommentSerializer(serializers.ModelSerializer):
+    user = UserBriefSerializer()
+    replies = serializers.SerializerMethodField()
+
+    class Meta:
+        model = PostComment
+        fields = ['id', 'user', 'parent_id', 'content', 'replies', 'created_at']
+
+    def get_replies(self, obj):
+        if obj.replies.exists():
+            return PostCommentSerializer(obj.replies.all(), many=True).data
+        return None
+
+class PostDetailSerializer(serializers.ModelSerializer):
+    user = UserBriefSerializer()
+    comments = PostCommentSerializer(many=True)
+
+
+    class Meta:
+        model = Post
+        fields = ['id', 'user', 'image', 'description', 'comments', 'created_at']
