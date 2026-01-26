@@ -1,7 +1,7 @@
 from django.db.models import Prefetch
 from django.shortcuts import render
 from django.core.exceptions import PermissionDenied
-from rest_framework.generics import ListCreateAPIView, CreateAPIView, RetrieveAPIView, RetrieveDestroyAPIView
+from rest_framework.generics import ListCreateAPIView, CreateAPIView, RetrieveAPIView, RetrieveDestroyAPIView, DestroyAPIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.pagination import CursorPagination
 from rest_framework_simplejwt.authentication import JWTAuthentication
@@ -63,3 +63,23 @@ class PostDetailView(RetrieveDestroyAPIView):
         if instance.user != self.request.user:
             raise PermissionDenied("게시물을 삭제할 권한이 없습니다.")
         instance.delete()
+
+class PostCommentDestroyView(DestroyAPIView):
+    queryset = PostComment.objects.all()
+    lookup_url_kwarg = "comment_id"
+    permission_classes = [IsAuthenticated]
+    authentication_classes = [JWTAuthentication]
+
+    def perform_destroy(self, instance):
+        if instance.user != self.request.user:
+            raise PermissionDenied("댓글을 삭제할 권한이 없습니다.")
+
+        # 1) 댓글 삭제 -> 대댓글(CASCADE) => Hard Delete
+        instance.delete()
+
+        # 2) 댓글 삭제 -> 대댓글 유지 => Soft Delete
+        # if instance.parent is None and instance.replies.exists():
+        #     instance.content = "삭제된 댓글입니다."
+        #     instance.save()
+        # else:
+        #     instance.delete()
