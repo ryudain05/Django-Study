@@ -1,6 +1,7 @@
 from django.db.models import Prefetch
 from django.shortcuts import render
-from rest_framework.generics import ListCreateAPIView, CreateAPIView, RetrieveAPIView
+from django.core.exceptions import PermissionDenied
+from rest_framework.generics import ListCreateAPIView, CreateAPIView, RetrieveAPIView, RetrieveDestroyAPIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.pagination import CursorPagination
 from rest_framework_simplejwt.authentication import JWTAuthentication
@@ -42,7 +43,7 @@ class PostCommentView(CreateAPIView):
     def perform_create(self, serializer):
         serializer.save(user_id=self.request.user.id)
 
-class PostDetailView(RetrieveAPIView):
+class PostDetailView(RetrieveDestroyAPIView):
     queryset = Post.objects.all()
     serializer_class = PostDetailSerializer
     lookup_url_kwarg = "post_id"
@@ -51,9 +52,14 @@ class PostDetailView(RetrieveAPIView):
 
     # get_queryset -> get_object 1개
     def get_queryset(self):
-        return super().get_queryset().prefetch_related(
+        return super().get_queryset().select_related("user").prefetch_related(
             Prefetch(
                 'comments',
-                queryset=PostComment.objects.filter(parent=None)
+                queryset=PostComment.objects.filter(parent=None).prefetch_related('replies', 'user')
             )
         )
+
+    def perform_destroy(self, instance):
+        if instance.user != self.request.user:
+            raise PermissionDenied("게시물을 삭제할 권한이 없습니다.")
+        instance.delete()
