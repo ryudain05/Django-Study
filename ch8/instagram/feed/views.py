@@ -1,15 +1,15 @@
 from django.db.models import Prefetch
 from django.shortcuts import render
 from django.core.exceptions import PermissionDenied
-from rest_framework.generics import ListCreateAPIView, CreateAPIView, RetrieveAPIView, RetrieveDestroyAPIView, DestroyAPIView
+from rest_framework.generics import ListCreateAPIView, CreateAPIView, RetrieveAPIView, RetrieveDestroyAPIView, DestroyAPIView, GenericAPIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.pagination import CursorPagination
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework import status
 from rest_framework.response import Response
 
-from feed.models import Post, PostComment
-from feed.serializers import PostSerializer, PostCommentCreateSerializer, PostDetailSerializer
+from feed.models import Post, PostComment, PostLike
+from feed.serializers import PostSerializer, PostCommentCreateSerializer, PostDetailSerializer, PostLikeSerializer
 
 
 class PostCursorPagination(CursorPagination):
@@ -83,3 +83,18 @@ class PostCommentDestroyView(DestroyAPIView):
         #     instance.save()
         # else:
         #     instance.delete()
+
+class PostLikeView(GenericAPIView):
+    permission_classes = [IsAuthenticated]
+    authentication_classes = [JWTAuthentication]
+
+    def post(self, request, post_id):
+        like, created = PostLike.objects.get_or_create(post_id=post_id, user_id=request.user.id)
+        serializer = PostLikeSerializer(like)
+        if created:
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    def delete(self, request, post_id):
+        PostLike.objects.filter(post_id=post_id, user_id=request.user.id).delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)

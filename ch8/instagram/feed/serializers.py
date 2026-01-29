@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from feed.models import Post, PostComment
+from feed.models import Post, PostComment, PostLike
 from user.models import CustomUser
 
 
@@ -62,3 +62,8 @@ class PostDetailSerializer(serializers.ModelSerializer):
     class Meta:
         model = Post
         fields = ['id', 'user', 'image', 'description', 'comments', 'created_at']
+
+class PostLikeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = PostLike
+        fields = ['id', 'post_id', 'user_id', 'created_at']
